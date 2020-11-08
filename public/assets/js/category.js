@@ -67,3 +67,71 @@ $('#formBox').on('submit', '#modifyCategory', function() {
     // 阻止默认提交行为
     return false;
 });
+
+// 通过事件委托为删除按钮添加点击事件
+$('#categoryBox').on('click', '.delete', function () {
+    if(confirm('您确定要执行删除操作吗？')) {
+        // 获取被删除分类数据的id
+        var id = $(this).attr('data-id');
+        // 调用接口发送删除请求
+        $.ajax({
+            type: 'delete',
+            url: '/categories/' + id,
+            success: function (response) {
+                location.reload();
+            }
+        })
+    }
+});
+
+// 获取全选按钮
+var selectAll = $('#selectAll');
+// 获取批量删除按钮
+var deleteMany = $('#deleteMany');
+
+// 为全选复选框添加onchange事件
+selectAll.on('change', function () {
+    var selectStatus = $(this).prop('checked');
+    if (selectStatus) {
+        deleteMany.show();
+    } else {
+        deleteMany.hide();
+    }
+    $('#categoryBox').find('input').prop('checked', selectStatus);
+});
+
+// 当分类数据前面的复选框状态发生改变时
+$('#categoryBox').on('change', '.categoryStatus', function () {
+    var inputs = $('#categoryBox').find('input');
+    if (inputs.length == inputs.filter(':checked').length) {
+        selectAll.prop('checked', true);
+    } else {
+        selectAll.prop('checked', false);
+    }
+    if (inputs.filter(':checked').length > 0) {
+        deleteMany.show();
+    } else {
+        deleteMany.hide();
+    }
+});
+
+// 为批量删除按钮添加点击事件
+deleteMany.on('click', function () {
+    var ids = [];
+    // 获取选中的用户
+    var checkedUser = $('#categoryBox').find('input').filter(':checked');
+    // 循环复选框 从复选框元素上获得data-id属性的值
+    checkedUser.each(function (index, element) {
+        ids.push($(element).attr('data-id'));
+    });
+    
+    if(confirm('您确认进行批量删除操作吗？')) {
+        $.ajax({
+            type: 'delete',
+            url: '/categories/' + ids.join('-'),
+            success: function () {
+                location.reload();
+            }
+        })
+    }
+});
