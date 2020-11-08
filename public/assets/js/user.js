@@ -38,3 +38,17 @@ $('#avatar').on('change', function () {
         }
     })
 })
+
+// 获取用户列表
+$.ajax({
+    type: 'get',
+    url: '/users',
+    success: function (response) {
+        // 使用模板引擎将数据和HTML字符串拼接
+        var html = template('userTpl', {
+            data: response
+        });
+        // 将拼接好的字符串显示在页面中
+        $('#userBox').html(html);
+    }
+})
