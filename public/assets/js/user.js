@@ -18,3 +18,23 @@ $('#userForm').on('submit', function () {
     // 组织表单的默认提交行为
     return false;
 })
+
+// 当用户选择文件时
+$('#avatar').on('change', function () {
+    var formData = new FormData();
+    formData.append('avatar', this.files[0]);
+
+    $.ajax({
+        type: 'post',
+        url: '/upload',
+        data: formData,
+        // 不要解析请求参数
+        processData: false,
+        // 不要设置请求参数的类型
+        contentType: false,
+        success: function (response) {
+            $('#preview').attr('src', response[0].avatar);
+            $('#hiddenAvatar').val(response[0].avatar);
+        }
+    })
+})
